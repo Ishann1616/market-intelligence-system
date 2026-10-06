@@ -2,7 +2,7 @@ import pandas as pd
 
 TRANSACTION_COST_PCT = 0.001 # 0.1% per trade — covers fees + slippage
 
-def run_backtesting(signal_df: pd.DataFrame, prices_df: pd.DataFrame, starting_capital: float = 10000) -> pd.DataFrame:
+def run_backtest(signal_df: pd.DataFrame, prices_df: pd.DataFrame, starting_capital: float = 10000) -> pd.DataFrame:
     merged = pd.merge(signal_df[["date", "signal"]], prices_df[["date", "close"]], on="date", how="inner")
     merged = merged.sort_values("date").reset_index(drop=True)
 
