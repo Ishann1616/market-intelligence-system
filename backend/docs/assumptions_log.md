@@ -3,20 +3,27 @@
 Every assumption or simplification made while building, and how it could affect results.
 
 ## Data
-- Test stocks: AAPL, TSLA, JPM, KO, NVDA, MSFT (5 years of daily data via yfinance)
-- All 6 test stocks are large-cap US survivors that moved together in a bull market, so they are not 6 independent tests
+- Test stocks: AAPL, TSLA, JPM, KO, NVDA, MSFT (daily data via yfinance)
+- History window: 10 years (extended from 5 after the first round of results; 5-year results saved in docs/results_5y_same_day.md)
+- Prices are yfinance's dividend- and split-adjusted close (default settings); logged closes can differ slightly from raw quoted prices
+- All 6 stocks are large-cap US survivors that moved together, so they are not 6 independent tests
 
 ## Backtest
 - Trades cost 0.1% each (fees + slippage combined), a rough estimate
 - Strategies are all-in or all-out: 100% stock or 100% cash, no partial positions
 - Cash earns 0% while out of the market (slightly penalizes both strategies)
-- All strategies start on 2021-12-06, the latest warmup end, so the comparison is fair
+- All strategies start on the same day, after the longest indicator warmup (50-day MA), so the comparison is fair
+- Signals use a day's closing price and are executed at the NEXT trading day's close (one-day delay). Early runs executed at the same close that produced the signal, which was optimistic
 
 ## Metrics
 - Sharpe ratio uses a risk-free rate of 0 (makes Sharpe look slightly better than reality)
-- Bootstrap significance test: 10-day block resampling, 5,000 iterations, seed 42, paired against buy-and-hold. All 12 strategy/ticker comparisons came back inconclusive; ~5 years of data can't resolve Sharpe differences smaller than about ±0.7
+- Bootstrap significance test: 10-day block resampling, 5,000 iterations, seed 42, paired against buy-and-hold
+
+## Forward signal log
+- Computed in memory from a fresh 1-year yfinance pull using the same formulas as the agents; verified against the database values
+- Runs automatically each US trading day via GitHub Actions; missed or failed days are left as gaps, never backfilled
+- Logs signals, not trades
 
 ## Known limitations
-- Results so far come from one stock (AAPL) in one regime (a long uptrend), so they don't generalize yet
+- 5-year results (Sept 2021 to Sept 2026) could not distinguish any strategy from buy-and-hold (all 12 comparisons inconclusive)
 - Lower volatility and shallower drawdowns for both strategies are partly mechanical (time spent in cash), not proof of skill
-
