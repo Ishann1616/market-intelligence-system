@@ -3,7 +3,7 @@ import pandas as pd
 import os
 
 TICKERS =["AAPL", "TSLA", "JPM", "KO", "NVDA", "MSFT"]
-PERIOD = "5y"
+PERIOD = "10y"
 
 def fetch_stock_data(ticker: str)-> pd.DataFrame:
     print(f"Fetching {ticker}....")
@@ -17,8 +17,7 @@ def main():
     all_data = []
     for ticker in TICKERS:
         df= fetch_stock_data(ticker)
-        df.to_csv(ticker)
-        df.to_csv(f"raw_data/{ticker}.csv ")
+        df.to_csv(f"raw_data/{ticker}.csv")
         all_data.append(df)
         print(f"Saved {ticker}: {len(df)} rows")
 
