@@ -14,6 +14,7 @@ Every assumption or simplification made while building, and how it could affect 
 
 ## Metrics
 - Sharpe ratio uses a risk-free rate of 0 (makes Sharpe look slightly better than reality)
+- Bootstrap significance test: 10-day block resampling, 5,000 iterations, seed 42, paired against buy-and-hold. All 12 strategy/ticker comparisons came back inconclusive; ~5 years of data can't resolve Sharpe differences smaller than about ±0.7
 
 ## Known limitations
 - Results so far come from one stock (AAPL) in one regime (a long uptrend), so they don't generalize yet
