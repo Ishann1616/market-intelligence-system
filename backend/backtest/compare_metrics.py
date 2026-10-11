@@ -18,12 +18,11 @@ def get_price_df(ticker, session):
     rows = session.query(Price).filter(Price.ticker == ticker).order_by(Price.date).all()
     return pd.DataFrame([{"date": r.date, "close": r.close} for r in rows])
 
-def analyze_ticker(ticker, session):
+def build_curves(ticker, session):
     prices = get_price_df(ticker, session)
     momentum_signals = get_momentum_signals(ticker, session)
     mean_rev_signals = get_mean_reversion_signals(ticker, session)
 
-    # Common start = the latest "first valid day" among the strategies
     common_start = max(momentum_signals["date"].min(), mean_rev_signals["date"].min())
 
     prices = prices[prices["date"] >= common_start].reset_index(drop=True)
@@ -34,13 +33,16 @@ def analyze_ticker(ticker, session):
     mr_result = run_backtest(mean_rev_signals, prices, STARTING_CAPITAL)
 
     shares = STARTING_CAPITAL / prices["close"].iloc[0]
-    buy_hold_values = prices["close"] * shares
 
-    return pd.DataFrame({
-        "Buy & Hold": compute_metrics(buy_hold_values),
-        "Momentum": compute_metrics(mom_result["portfolio_value"]),
-        "Mean-Reversion": compute_metrics(mr_result["portfolio_value"]),
-    }).T
+    return {
+        "Buy & Hold": prices["close"] * shares,
+        "Momentum": mom_result["portfolio_value"],
+        "Mean-Reversion": mr_result["portfolio_value"],
+    }
+
+def analyze_ticker(ticker, session):
+    curves = build_curves(ticker, session)
+    return pd.DataFrame({name: compute_metrics(v) for name , v in curves.items()}).T
 
 def main():
     session = SessionLocal()
