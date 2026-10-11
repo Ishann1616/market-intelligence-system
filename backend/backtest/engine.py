@@ -4,7 +4,8 @@ TRANSACTION_COST_PCT = 0.001 # 0.1% per trade — covers fees + slippage
 
 def run_backtest(signal_df: pd.DataFrame, prices_df: pd.DataFrame, starting_capital: float = 10000) -> pd.DataFrame:
     merged = pd.merge(signal_df[["date", "signal"]], prices_df[["date", "close"]], on="date", how="inner")
-    merged = merged.sort_values("date").reset_index(drop=True)
+    # Trade on the NEXT day's close, using the signal known at the previous close
+    merged["signal"] = merged["signal"].shift(1).fillna("HOLD")
 
     cash = starting_capital
     shares = 0.0
