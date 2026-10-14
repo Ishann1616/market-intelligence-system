@@ -73,6 +73,9 @@ def main():
     for ticker in TICKERS:
         close = drop_unfinished_bar(fetch_closes(ticker))
         df = compute_indicators(close)
+        recent = df.iloc[-2:][["close", "ma_short", "ma_long", "rsi"]]
+        if recent.isna().any().any():
+            raise RuntimeError(f"{ticker}: NaN in latest bars, refusing to log:\n{recent}")
         signal_date = str(close.index[-1])
         price = round(float(close.iloc[-1]), 2)
 
