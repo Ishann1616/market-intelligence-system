@@ -27,3 +27,8 @@ Every assumption or simplification made while building, and how it could affect 
 ## Known limitations
 - 5-year results (Sept 2021 to Sept 2026) could not distinguish any strategy from buy-and-hold (all 12 comparisons inconclusive)
 - Lower volatility and shallower drawdowns for both strategies are partly mechanical (time spent in cash), not proof of skill
+## 2026-10-14: Forward log incident (10-13 rows)
+- The bot's run for signal date 2026-10-13 (logged 2026-10-14T00:56 UTC) wrote 12 rows with blank confidence and close. Cause (hypothesis, not verified): Yahoo returned a NaN close for the latest bar, NaN comparisons evaluated False, and the script logged fake HOLD/SELL signals.
+- Fix 1: log_signals.py now raises if close, MAs or RSI are NaN in the last 2 bars (commit 0ccea04).
+- Fix 2: the 12 bad rows were deleted and recomputed at 2026-10-14T10:53 UTC, before the 10-13 signals could be traded (execution is the 10-14 close). Values checked for consistency with 10-12.
+- Known weakness: the script logs only the latest bar, so a missed run is a permanent gap. Possible catch-up mode later.
