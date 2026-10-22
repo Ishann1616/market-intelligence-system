@@ -38,3 +38,8 @@ Every assumption or simplification made while building, and how it could affect 
 - Signal dates 2026-10-14 to 2026-10-19 were never logged live. 
 - Fix: log_signals.py skips trailing NaN bars (printing each one), uses the latest complete bar, and raises if that bar is more than 5 days old.
 - Rule: a row counts as LIVE only if logged_at_utc is before the close of the next trading day (execution time). Later rows are LATE/backfill and are excluded from forward-test results. The 2026-10-20 rows are late (logged 2026-10-22).
+
+## 2026-10-22: Correction and recovery
+- Missing signal dates (never logged): 2026-10-14, 10-15, 10-16, 10-19, 10-20 (60 rows). Only backfill is possible; backfill rows never count toward live results.
+- Workflow failure found in a manual run: Commit step rejected with "fetch first" (remote moved during the run). Fix: git pull --rebase origin main before git push (commit b95c7b4). Cause of runs #5-#10 failing still unverified.
+- Manual run #11 (2026-10-22 11:25 UTC) logged 12 rows for signal date 2026-10-21. LIVE (logged before the 20:00 UTC execution close). Yahoo's 10-21 bar was NaN at 11:20 UTC on my Mac and filled by 11:25 UTC on the runner (cause unknown).
