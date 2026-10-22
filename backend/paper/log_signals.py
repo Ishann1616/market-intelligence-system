@@ -69,15 +69,22 @@ def main():
 
     logged_at = datetime.now(timezone.utc).isoformat(timespec="seconds")
     new_rows = []
-
+    
     for ticker in TICKERS:
         close = drop_unfinished_bar(fetch_closes(ticker))
+        while len(close) and pd.isna(close.iloc[-1]):
+            print(f"{ticker}: bar {close.index[-1]} has no close yet, using the previous bar")
+            close = close.iloc[:-1]
+        age = (datetime.now(ZoneInfo("America/New_York")).date() - close.index[-1]).days
+        if age > 5:
+            raise RuntimeError(f"{ticker}: latest complete bar is {age} days old, data feed looks broken")
         df = compute_indicators(close)
         recent = df.iloc[-2:][["close", "ma_short", "ma_long", "rsi"]]
         if recent.isna().any().any():
             raise RuntimeError(f"{ticker}: NaN in latest bars, refusing to log:\n{recent}")
         signal_date = str(close.index[-1])
         price = round(float(close.iloc[-1]), 2)
+
 
         for agent, fn in [("momentum", momentum_signal), ("mean_reversion", mean_reversion_signal)]:
             if (signal_date, ticker, agent) in seen:
@@ -88,6 +95,9 @@ def main():
                 "signal": signal, "confidence": confidence,
                 "close": price, "logged_at_utc": logged_at,
             })
+    if "--dry-run" in sys.argv:
+        print(pd.DataFrame(new_rows).to_string(index=False))
+        return 
 
     if new_rows:
         pd.DataFrame(new_rows).to_csv(LOG_PATH, mode="a", header=not file_exists, index=False)
