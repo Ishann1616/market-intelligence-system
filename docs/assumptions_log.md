@@ -32,3 +32,9 @@ Every assumption or simplification made while building, and how it could affect 
 - Fix 1: log_signals.py now raises if close, MAs or RSI are NaN in the last 2 bars (commit 0ccea04).
 - Fix 2: the 12 bad rows were deleted and recomputed at 2026-10-14T10:53 UTC, before the 10-13 signals could be traded (execution is the 10-14 close). Values checked for consistency with 10-12.
 - Known weakness: the script logs only the latest bar, so a missed run is a permanent gap. Possible catch-up mode later.
+
+## 2026-10-22: Forward log outage and late-row rule
+- From 2026-10-14 to 2026-10-21 the daily workflow failed (red X), because Yahoo returned a latest bar with NaN OHLC (volume present) for all 6 tickers, which the NaN guard correctly refused. Cause on Yahoo's side is unverified. I did not check the Actions tab for 8 days: monitoring failure.
+- Signal dates 2026-10-14 to 2026-10-19 were never logged live. 
+- Fix: log_signals.py skips trailing NaN bars (printing each one), uses the latest complete bar, and raises if that bar is more than 5 days old.
+- Rule: a row counts as LIVE only if logged_at_utc is before the close of the next trading day (execution time). Later rows are LATE/backfill and are excluded from forward-test results. The 2026-10-20 rows are late (logged 2026-10-22).
