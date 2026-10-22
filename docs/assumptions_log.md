@@ -48,3 +48,7 @@ Every assumption or simplification made while building, and how it could affect 
 - Backtest data: Postgres prices table, 6 tickers x 2514 rows each, 2016-10-10 to 2026-10-09. Checked for duplicates and NaN: none (all columns NOT NULL, rows = distinct dates per ticker).
 - The dataset stays frozen at 2026-10-09 for all Week 5 results. No reload until Week 5 is written up, because Yahoo's newest bars have been unreliable.
 - Known weakness: no unique constraint on (ticker, date). To add later.
+
+## 2026-10-22: Engine v2 rebalancing rule (decided before any manager results)
+- Trades happen only when the target exposure changes. No rebalancing for price drift between changes. Cost = 0.1% of the amount traded at each change.
+- Target exposure decided with data through day t is applied at the close of day t+1 (same 1-day shift as engine v1). Day 0 target is 0.
