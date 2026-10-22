@@ -43,3 +43,8 @@ Every assumption or simplification made while building, and how it could affect 
 - Missing signal dates (never logged): 2026-10-14, 10-15, 10-16, 10-19, 10-20 (60 rows). Only backfill is possible; backfill rows never count toward live results.
 - Workflow failure found in a manual run: Commit step rejected with "fetch first" (remote moved during the run). Fix: git pull --rebase origin main before git push (commit b95c7b4). Cause of runs #5-#10 failing still unverified.
 - Manual run #11 (2026-10-22 11:25 UTC) logged 12 rows for signal date 2026-10-21. LIVE (logged before the 20:00 UTC execution close). Yahoo's 10-21 bar was NaN at 11:20 UTC on my Mac and filled by 11:25 UTC on the runner (cause unknown).
+
+## 2026-10-22: Backtest data freeze
+- Backtest data: Postgres prices table, 6 tickers x 2514 rows each, 2016-10-10 to 2026-10-09. Checked for duplicates and NaN: none (all columns NOT NULL, rows = distinct dates per ticker).
+- The dataset stays frozen at 2026-10-09 for all Week 5 results. No reload until Week 5 is written up, because Yahoo's newest bars have been unreliable.
+- Known weakness: no unique constraint on (ticker, date). To add later.
