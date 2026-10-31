@@ -29,10 +29,10 @@ def run_backtest_v2(exposure_df: pd.DataFrame, prices_df: pd.DataFrame, starting
         target = row["target"]
 
         if abs(target - prev_target)> 1e-12:
-            value = cash + shares* price
-            traded = abs(target * values - shares * price)
+            value = cash + shares * price
+            traded = abs(target * value - shares * price)   # money moved
             cost = traded * TRANSACTION_COST_PCT
-            value_after = value - cost 
+            value_after = value - cost
             shares = target * value_after / price
             cash = value_after - shares * price
             prev_target = target
