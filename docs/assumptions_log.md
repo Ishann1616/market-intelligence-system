@@ -56,3 +56,8 @@ Every assumption or simplification made while building, and how it could affect 
 ## 2026-10-22: Engine v2 rebalancing rule (decided before any manager results)
 - Trades happen only when the target exposure changes. No rebalancing for price drift between changes. Cost = 0.1% of the amount traded at each change.
 - Target exposure decided with data through day t is applied at the close of day t+1 (same 1-day shift as engine v1). Day 0 target is 0.
+
+## 2026-10-31: Manager trailing-return definition (before any manager results)
+- Agent daily return on day k = agent state decided at day k-2 x stock return on day k (matches the engine's 1-day execution shift; uses no future data).
+- Trailing return at day t = compounded agent daily returns over days t-29..t (lookback 30). Weights = trailing returns floored at 0, normalized; 50/50 if both are 0 or if the window is not yet full (warmup detail, added here).
+- Data frozen at 2026-10-09 (Postgres).
