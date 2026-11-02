@@ -27,6 +27,16 @@ def test_partial_position_by_hand():
     assert np.allclose(out["portfolio_value"].values, expected), out["portfolio_value"].tolist()
     print("TEST 2 PASSED: hand-checked partial position")
 
+def test_changing_exposure_by_hand():
+    prices = pd.DataFrame({"date": pd.bdate_range("2024-01-01", periods=5).date,
+                           "close": [100.0, 100.0, 100.0, 110.0, 110.0]})
+    expo = pd.DataFrame({"date": prices["date"], "exposure": [0.8, 0.8, 0.3, 0.3, 0.3]})
+    out = run_backtest_v2(expo, prices)
+    expected = [10000.0, 9992.0, 9992.0, 10785.804448, 10785.804448]
+    assert np.allclose(out["portfolio_value"].values, expected), out["portfolio_value"].tolist()
+    print("TEST 3 PASSED: changing exposure 0.8 -> 0.3 by hand")
+
 if __name__ == "__main__":
     test_matches_old_engine()
     test_partial_position_by_hand()
+    test_changing_exposure_by_hand()
