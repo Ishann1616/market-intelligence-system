@@ -8,6 +8,8 @@ import yfinance as yf
 
 TICKERS = ["AAPL", "TSLA", "JPM", "KO", "NVDA", "MSFT"]
 LOG_PATH = os.path.join(os.path.dirname(__file__), "..", "..", "logs", "signal_log.csv")
+CATCH_UP_BARS = 5   # each run checks the last 5 complete bars for missing rows
+
 
 def fetch_closes(ticker):
     df = yf.download(ticker, period="1y", interval="1d", progress=False)
@@ -15,11 +17,13 @@ def fetch_closes(ticker):
     close.index = pd.to_datetime(close.index).date
     return close
 
+
 def drop_unfinished_bar(close):
     now_et = datetime.now(ZoneInfo("America/New_York"))
     if close.index[-1] == now_et.date() and (now_et.hour, now_et.minute) < (16, 15):
         return close.iloc[:-1]
     return close
+
 
 def compute_indicators(close):
     df = pd.DataFrame({"close": close})
@@ -31,6 +35,7 @@ def compute_indicators(close):
     rs = gain.rolling(14).mean() / loss.rolling(14).mean()
     df["rsi"] = 100 - 100 / (1 + rs)
     return df
+
 
 def momentum_signal(df):
     above = df["ma_short"] > df["ma_long"]
@@ -45,11 +50,13 @@ def momentum_signal(df):
     confidence = round(abs(last["ma_short"] - last["ma_long"]) / last["ma_long"], 4)
     return signal, confidence
 
+
 def mean_reversion_signal(df):
     rsi = df["rsi"].iloc[-1]
     signal = "BUY" if rsi < 30 else "SELL" if rsi > 70 else "HOLD"
     confidence = round(abs(rsi - 50) / 50, 4)
     return signal, confidence
+
 
 def verify():
     # One-time check: should match the values already stored in your database
@@ -58,6 +65,7 @@ def verify():
     print("ma_short:", row["ma_short"], "(database: 329.39600067138673)")
     print("ma_long: ", row["ma_long"], "(database: 321.74280212402346)")
     print("rsi:     ", row["rsi"], "(database: 74.39873469091043)")
+
 
 def main():
     os.makedirs(os.path.dirname(LOG_PATH), exist_ok=True)
@@ -69,35 +77,50 @@ def main():
 
     logged_at = datetime.now(timezone.utc).isoformat(timespec="seconds")
     new_rows = []
-    
+
     for ticker in TICKERS:
         close = drop_unfinished_bar(fetch_closes(ticker))
+
+        # Strip trailing bars that Yahoo has not filled in yet (NaN close)
         while len(close) and pd.isna(close.iloc[-1]):
             print(f"{ticker}: bar {close.index[-1]} has no close yet, using the previous bar")
             close = close.iloc[:-1]
+
         age = (datetime.now(ZoneInfo("America/New_York")).date() - close.index[-1]).days
         if age > 5:
             raise RuntimeError(f"{ticker}: latest complete bar is {age} days old, data feed looks broken")
+
         df = compute_indicators(close)
-        recent = df.iloc[-2:][["close", "ma_short", "ma_long", "rsi"]]
+
+        # Fail loudly if any bar we are about to use has a NaN
+        recent = df.iloc[-(CATCH_UP_BARS + 1):][["close", "ma_short", "ma_long", "rsi"]]
         if recent.isna().any().any():
-            raise RuntimeError(f"{ticker}: NaN in latest bars, refusing to log:\n{recent}")
-        signal_date = str(close.index[-1])
-        price = round(float(close.iloc[-1]), 2)
+            raise RuntimeError(f"{ticker}: NaN in recent bars, refusing to log:\n{recent}")
 
+        # Catch-up: check each of the last N complete bars, log whichever is missing.
+        # Cutting the table at an earlier day gives exactly the signal that day produced,
+        # because rolling windows only look backwards.
+        for end in range(len(df) - CATCH_UP_BARS, len(df)):
+            sub = df.iloc[:end + 1]
+            signal_date = str(sub.index[-1])
+            price = round(float(sub["close"].iloc[-1]), 2)
 
-        for agent, fn in [("momentum", momentum_signal), ("mean_reversion", mean_reversion_signal)]:
-            if (signal_date, ticker, agent) in seen:
-                continue
-            signal, confidence = fn(df)
-            new_rows.append({
-                "signal_date": signal_date, "ticker": ticker, "agent": agent,
-                "signal": signal, "confidence": confidence,
-                "close": price, "logged_at_utc": logged_at,
-            })
+            for agent, fn in [("momentum", momentum_signal), ("mean_reversion", mean_reversion_signal)]:
+                if (signal_date, ticker, agent) in seen:
+                    continue
+                signal, confidence = fn(sub)
+                new_rows.append({
+                    "signal_date": signal_date, "ticker": ticker, "agent": agent,
+                    "signal": signal, "confidence": confidence,
+                    "close": price, "logged_at_utc": logged_at,
+                })
+
     if "--dry-run" in sys.argv:
-        print(pd.DataFrame(new_rows).to_string(index=False))
-        return 
+        if new_rows:
+            print(pd.DataFrame(new_rows).to_string(index=False))
+        else:
+            print("Dry run: nothing new to log")
+        return
 
     if new_rows:
         pd.DataFrame(new_rows).to_csv(LOG_PATH, mode="a", header=not file_exists, index=False)
@@ -105,6 +128,7 @@ def main():
         print(pd.DataFrame(new_rows).to_string(index=False))
     else:
         print("Nothing new to log (already up to date)")
+
 
 if __name__ == "__main__":
     if "--verify" in sys.argv:
