@@ -61,3 +61,9 @@ Every assumption or simplification made while building, and how it could affect 
 - Agent daily return on day k = agent state decided at day k-2 x stock return on day k (matches the engine's 1-day execution shift; uses no future data).
 - Trailing return at day t = compounded agent daily returns over days t-29..t (lookback 30). Weights = trailing returns floored at 0, normalized; 50/50 if both are 0 or if the window is not yet full (warmup detail, added here).
 - Data frozen at 2026-10-09 (Postgres).
+
+## 2026-11-20: Week 5 result (pre-registered design, lookback 30, data frozen at 2026-10-09)
+- Average Sharpe over 6 tickers: Manager 0.685, Static 50/50 0.744, Momentum 0.625, Mean-Reversion 0.552, Buy & Hold 0.909.
+- Manager vs Static 50/50: worse on average (-0.059), better on 1 of 6 tickers (TSLA), no significant differences. Manager vs Buy & Hold: worse on 6 of 6, significant on MSFT only. Pre-registered success criterion NOT met.
+- Sensitivity (shown, not selected): average Sharpe 0.759 / 0.685 / 0.679 / 0.647 at lookback 20 / 30 / 45 / 60. Primary setting stays 30. Any follow-up on shorter lookbacks is exploratory.
+- Raw output: results_week5.txt.
