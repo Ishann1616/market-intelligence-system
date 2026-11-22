@@ -67,3 +67,10 @@ Every assumption or simplification made while building, and how it could affect 
 - Manager vs Static 50/50: worse on average (-0.059), better on 1 of 6 tickers (TSLA), no significant differences. Manager vs Buy & Hold: worse on 6 of 6, significant on MSFT only. Pre-registered success criterion NOT met.
 - Sensitivity (shown, not selected): average Sharpe 0.759 / 0.685 / 0.679 / 0.647 at lookback 20 / 30 / 45 / 60. Primary setting stays 30. Any follow-up on shorter lookbacks is exploratory.
 - Raw output: results_week5.txt.
+
+## 2026-11-22: Week 6 data check, historical sentiment backtest NOT feasible
+- Checked FNSPID news files on Hugging Face (nasdaq_exteral_data.csv, 23.2 GB; All_external.csv, 5.73 GB). Only the first ~75% / ~6% of them are ticker-tagged stock news; the rest is unrelated news.
+- Nasdaq file: AAPL, MSFT, TSLA, NVDA only from 2021-2022 to 2023-12-16 (about 8,700 rows each); KO from 2009; JPM absent. Benzinga file: patchy (AAPL 441 rows, MSFT none found, JPM 10 rows, TSLA from 2019, NVDA and KO longer).
+- Timestamps are date-only in 97-99% of rows. No window covers all 6 tickers; best common window is about 2022-06 to 2023-12 for 5 tickers (about 320 usable days), which has too little power for a meaningful test.
+- Decision: no historical sentiment backtest. Sentiment is collected forward only, with fetch time stored per headline. Any later result is exploratory.
+- Raw data stays outside the repo (third-party licences); only the probe scripts are committed (backend/data/news_probe/).
