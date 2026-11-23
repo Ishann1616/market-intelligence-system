@@ -82,3 +82,13 @@ Every assumption or simplification made while building, and how it could affect 
 - Known approximation: the early close on the day after Thanksgiving is ignored. A row logged near that cutoff could be mislabelled by up to 3 hours.
 - Result as of 2026-11-23: 276 rows, 23 signal dates, 216 live and 60 late. The late dates are 10-22, 10-23, 10-26, 11-03 and 11-04.
 - Hand-check: AAPL momentum rows for the 5 late dates were each logged 4 to 5 hours after the cutoff, and the 11-02 row was logged about 17.5 hours before it. All 6 matched their labels. Only one ticker and one agent were checked per date.
+
+## 2026-11-24: Week 7 API, live/late labelling and /backtest endpoint
+- A signal row is LIVE if logged_at_utc is before the close of the next trading day, otherwise LATE. Late rows are excluded from forward-test results.
+- Next trading day = next weekday not in a hardcoded holiday list (2026-11-26, 2026-12-25). The list must be extended by hand for later dates.
+- Execution close is 20:00 UTC before 2026-11-02 and 21:00 UTC from 2026-11-02 (US clock change).
+- Known approximation: the early close on the day after Thanksgiving is ignored. A row logged near that cutoff could be mislabelled by up to 3 hours.
+- Result as of 2026-11-23: 276 rows, 23 signal dates, 216 live and 60 late. Late dates: 10-22, 10-23, 10-26, 11-03, 11-04.
+- Hand-check: AAPL momentum rows for the 5 late dates were each logged 4 to 5 hours after the cutoff, and the 11-02 row about 17.5 hours before it. All 6 matched their labels. Only one ticker and one agent were checked per date.
+- /backtest/{ticker} reuses the Week 5 code (agent_states, manager_exposure, static_exposure, engine v2, lookback 30). No new backtest logic. Check: AAPL Momentum final value 46750.57 matches the Week 5 hand-verified number, and Buy & Hold starts at 10000.
+- Actions check 2026-11-24: runs #24 to #33 (Nov 10 to Nov 21) all green. Whether the catch-up fix removes weekday gaps is still to be judged over about 2 weeks.
