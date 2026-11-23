@@ -74,3 +74,11 @@ Every assumption or simplification made while building, and how it could affect 
 - Timestamps are date-only in 97-99% of rows. No window covers all 6 tickers; best common window is about 2022-06 to 2023-12 for 5 tickers (about 320 usable days), which has too little power for a meaningful test.
 - Decision: no historical sentiment backtest. Sentiment is collected forward only, with fetch time stored per headline. Any later result is exploratory.
 - Raw data stays outside the repo (third-party licences); only the probe scripts are committed (backend/data/news_probe/).
+
+## 2026-11-23: Week 7 API, live/late labelling in /signals/latest
+- A signal row is LIVE if logged_at_utc is before the close of the next trading day, otherwise LATE. Late rows are excluded from forward-test results.
+- Next trading day = next weekday not in a hardcoded holiday list (2026-11-26, 2026-12-25). The list must be extended by hand for later dates.
+- Execution close is 20:00 UTC before 2026-11-02 and 21:00 UTC from 2026-11-02 (US clock change).
+- Known approximation: the early close on the day after Thanksgiving is ignored. A row logged near that cutoff could be mislabelled by up to 3 hours.
+- Result as of 2026-11-23: 276 rows, 23 signal dates, 216 live and 60 late. The late dates are 10-22, 10-23, 10-26, 11-03 and 11-04.
+- Hand-check: AAPL momentum rows for the 5 late dates were each logged 4 to 5 hours after the cutoff, and the 11-02 row was logged about 17.5 hours before it. All 6 matched their labels. Only one ticker and one agent were checked per date.
