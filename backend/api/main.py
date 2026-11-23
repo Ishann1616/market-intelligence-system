@@ -1,9 +1,11 @@
 from fastapi import FastAPI, HTTPException, Query
 
+from api.signals import router as signals_router
 from db import SessionLocal
 from models.price import Price
 
 app = FastAPI(title="Market Intelligence API")
+app.include_router(signals_router)
 
 TICKERS = ["AAPL", "TSLA", "JPM", "KO", "NVDA", "MSFT"]
 
