@@ -4,6 +4,8 @@ from api.signals import router as signals_router
 from db import SessionLocal
 from models.price import Price
 
+from api.backtest import router as backtest_router
+
 app = FastAPI(title="Market Intelligence API")
 app.include_router(signals_router)
 
