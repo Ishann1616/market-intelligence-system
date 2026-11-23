@@ -9,7 +9,7 @@ router = APIRouter()
 
 START_CAPITAL = 10000
 
-@router.get("/bactest/{ticker}")
+@router.get("/backtest/{ticker}")
 def backtest(ticker:str):
     ticker = ticker.upper()
     if ticker not in TICKERS:

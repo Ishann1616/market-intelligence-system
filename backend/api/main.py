@@ -8,6 +8,7 @@ from api.backtest import router as backtest_router
 
 app = FastAPI(title="Market Intelligence API")
 app.include_router(signals_router)
+app.include_router(backtest_router)
 
 TICKERS = ["AAPL", "TSLA", "JPM", "KO", "NVDA", "MSFT"]
 
