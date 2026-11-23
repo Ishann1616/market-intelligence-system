@@ -5,10 +5,12 @@ from db import SessionLocal
 from models.price import Price
 
 from api.backtest import router as backtest_router
+from api.results import router as results_router
 
 app = FastAPI(title="Market Intelligence API")
 app.include_router(signals_router)
 app.include_router(backtest_router)
+app.include_router(results_router)
 
 TICKERS = ["AAPL", "TSLA", "JPM", "KO", "NVDA", "MSFT"]
 
