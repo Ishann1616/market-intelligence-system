@@ -1,4 +1,5 @@
 from fastapi import FastAPI, HTTPException, Query
+from fastapi.middleware.cors import CORSMiddleware
 
 from api.signals import router as signals_router
 from db import SessionLocal
@@ -8,6 +9,12 @@ from api.backtest import router as backtest_router
 from api.results import router as results_router
 
 app = FastAPI(title="Market Intelligence API")
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["http://localhost:5173"],
+    allow_methods=["GET"],
+    allow_headers=["*"],
+)
 app.include_router(signals_router)
 app.include_router(backtest_router)
 app.include_router(results_router)
