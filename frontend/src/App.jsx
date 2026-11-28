@@ -2,6 +2,8 @@ import { useEffect, useState } from "react";
 import Plotly from "plotly.js-dist-min";
 import createPlotlyComponent from "react-plotly.js/factory";
 import { API_URL } from "./config";
+import EquityChart from "./EquityChart";
+
 
 const Plot = createPlotlyComponent(Plotly);
 
@@ -72,6 +74,7 @@ function App() {
         useResizeHandler
         style={{ width: "100%", height: "420px" }}
       />
+      <EquityChart ticker={ticker} />
     </div>
   );
 }
