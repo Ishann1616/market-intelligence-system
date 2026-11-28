@@ -53,7 +53,13 @@ function EquityChart({ ticker }) {
         layout={{
           title: { text: `${ticker}: $10,000 start, 5 strategies` },
           xaxis: { title: { text: "Date" } },
-          yaxis: { title: { text: "Portfolio value (USD)" }, type: "log" },
+                    yaxis: {
+            title: { text: "Portfolio value (USD)" },
+            type: "log",
+            tickvals: [5000, 10000, 20000, 50000, 100000, 200000, 500000],
+            ticktext: ["5k", "10k", "20k", "50k", "100k", "200k", "500k"],
+            minor: { showgrid: false },
+          },
           autosize: true,
         }}
         useResizeHandler

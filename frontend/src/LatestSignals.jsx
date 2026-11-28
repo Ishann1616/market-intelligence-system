@@ -48,7 +48,11 @@ function LatestSignals() {
               <td>{r.signal}</td>
               <td>{r.confidence === null ? "n/a" : r.confidence.toFixed(4)}</td>
               <td>{r.close === null ? "n/a" : r.close.toFixed(2)}</td>
-              <td>{r.status.toUpperCase()}</td>
+              <td>
+                <span className={`badge ${r.status}`}>
+                  {r.status.toUpperCase()}
+                </span>
+              </td>
             </tr>
           ))}
         </tbody>
