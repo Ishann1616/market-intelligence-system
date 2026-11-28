@@ -3,6 +3,7 @@ import Plotly from "plotly.js-dist-min";
 import createPlotlyComponent from "react-plotly.js/factory";
 import { API_URL } from "./config";
 import EquityChart from "./EquityChart";
+import ResultsSummary from "./ResultsSummary";
 
 
 const Plot = createPlotlyComponent(Plotly);
@@ -39,6 +40,7 @@ function App() {
   return (
     <div>
       <h1>Market Intelligence</h1>
+      <ResultsSummary />
 
       <select value={ticker} onChange={(e) => setTicker(e.target.value)}>
         {tickers.map((t) => (
