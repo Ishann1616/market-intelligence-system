@@ -92,3 +92,8 @@ Every assumption or simplification made while building, and how it could affect 
 - Hand-check: AAPL momentum rows for the 5 late dates were each logged 4 to 5 hours after the cutoff, and the 11-02 row about 17.5 hours before it. All 6 matched their labels. Only one ticker and one agent were checked per date.
 - /backtest/{ticker} reuses the Week 5 code (agent_states, manager_exposure, static_exposure, engine v2, lookback 30). No new backtest logic. Check: AAPL Momentum final value 46750.57 matches the Week 5 hand-verified number, and Buy & Hold starts at 10000.
 - Actions check 2026-11-24: runs #24 to #33 (Nov 10 to Nov 21) all green. Whether the catch-up fix removes weekday gaps is still to be judged over about 2 weeks.
+
+## 2026-11-28: Forward-log incident, signal date 2026-11-24 logged late
+- Signal date 2026-11-24 was logged at 2026-11-26T03:58:58 UTC. Its cutoff was 2026-11-25 21:00 UTC, so it is LATE (about 7 hours) and excluded from forward-test results.
+- No bot commit exists for run date 2026-11-25. Hypothesis (unverified): that run wrote nothing and the next run caught up. Cause not yet confirmed from the Actions tab.
+- Log totals on 2026-11-28: 324 rows, 27 dates, 252 live, 72 late. Late dates: 10-22, 10-23, 10-26, 11-03, 11-04, 11-24.
