@@ -4,6 +4,7 @@ import createPlotlyComponent from "react-plotly.js/factory";
 import { API_URL } from "./config";
 import EquityChart from "./EquityChart";
 import ResultsSummary from "./ResultsSummary";
+import LatestSignals from "./LatestSignals";
 
 
 const Plot = createPlotlyComponent(Plotly);
@@ -77,6 +78,7 @@ function App() {
         style={{ width: "100%", height: "420px" }}
       />
       <EquityChart ticker={ticker} />
+      <LatestSignals />
     </div>
   );
 }
